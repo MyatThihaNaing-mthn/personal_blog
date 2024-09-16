@@ -23,7 +23,8 @@ export async function  uploadBase64ImageToFirebase (base64Image, filename ) {
     if (!base64Image) return null;
 
   const storage = getStorage();
-  const storageRef = ref(storage, `images/${filename}_${Date.now()}`);
+  filename = `${filename}_${Date.now()}`
+  const storageRef = ref(storage, `images/${filename}`);
 
   try {
     // Upload the base64 image to Firebase
@@ -32,7 +33,10 @@ export async function  uploadBase64ImageToFirebase (base64Image, filename ) {
     // Get the download URL for the uploaded image
     const downloadURL = await getDownloadURL(snapshot.ref);
     console.log("downdloadurl", downloadURL)
-    return downloadURL;
+    return {
+      url: downloadURL,
+      filename: filename
+    };
   } catch (error) {
     console.error("Error uploading image to Firebase:", error);
     return null;

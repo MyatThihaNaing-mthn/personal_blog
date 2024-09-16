@@ -1,12 +1,17 @@
+import deleteImageInFirebase from "@/firebase/deleteImageInFirebase";
 import {uploadImageToFirebase, uploadBase64ImageToFirebase} from "@/firebase/uploadImageToFirebase";
 import JoditEditor from "jodit-react";
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import PropTypes from 'prop-types';
 
-export default function CreateBlogPost({ placeholder }) {
+export default function CreateBlogPost({ placeholder="Tpye here" }) {
     const editorRef = useRef(null);
     const [content, setContent] = useState('');
+    // Store imageupload success obj {url,filename}
+    const [imagesInContent, setImagesInContent] = useState([]);
 
     const config = {
+        placeholder: placeholder,
         uploader: {
           insertImageAsBase64URI: true,
           url: '',
@@ -39,8 +44,9 @@ export default function CreateBlogPost({ placeholder }) {
                 if (file.startsWith('data:image')) {
                   // If it's a base64 image, upload it to Firebase first
                   uploadBase64ImageToFirebase(file, "test")
-                    .then((url) => {
-                      this.selection.insertImage(url);
+                    .then((successObj) => {
+                      this.selection.insertImage(successObj.url);
+                      setImagesInContent(prev => [...prev, successObj]);
                     })
                     .catch((error) => {
                       console.error('Error uploading base64 image:', error);
@@ -55,10 +61,11 @@ export default function CreateBlogPost({ placeholder }) {
           upload: async function (data) {
             const file = data.getAll('files')[0];
             try {
-              const url = await uploadImageToFirebase(file);
+              const successObj = await uploadImageToFirebase(file);
+              const imageUrl = successObj.url
               return {
                 success: true,
-                data: [{ url }]
+                data: [{ imageUrl }]
               };
             } catch (error) {
               return {
@@ -71,6 +78,23 @@ export default function CreateBlogPost({ placeholder }) {
           }
         }
       };
+
+    const onChangeHandler = (content) => {
+      console.log(content);
+
+      setContent(content);
+
+      const imageUrlsInEditor = Array.from(content.matchAll(/<img src="([^"]+)"/g)).map(match => match[1]);
+
+      const deletedImages = imagesInContent.filter(obj => !imageUrlsInEditor.includes(obj.url));
+
+      deletedImages.forEach(obj => {
+        const filename = obj.filename;
+        deleteImageInFirebase(filename).catch(error => console.log("Error deleting image in firebase", error));
+      })
+      const updatedImages = imagesInContent.filter(obj => !deletedImages.includes(obj));
+      setImagesInContent(updatedImages);
+    }
     return (
         <div className="editor w-full px-20 py-8">
             <JoditEditor
@@ -79,9 +103,12 @@ export default function CreateBlogPost({ placeholder }) {
                 tabIndex={1}
                 config={config}
                 onBlur={newContent => setContent(newContent)} // Save content on blur
-                onChange={newContent => { }}
+                onChange={newContent => onChangeHandler(newContent)}
             />
         </div>
     )
 }
 
+CreateBlogPost.propTypes = {
+  placeholder : PropTypes.string
+}
