@@ -5,13 +5,17 @@ export  async function uploadImageToFirebase(file){
     if(!file){
         return null;
     }
+    const filename = `${file.name}_${Date.now()}`
     const storage = getStorage();
-    const storageRef = ref(storage, `images/${file.name}/_${Date.now()}`);
+    const storageRef = ref(storage, `images/${filename}`);
     
     try {
         const snapshot = await uploadBytes(storageRef, file);
         const downloadUrl = await getDownloadURL(snapshot.ref);
-        return downloadUrl;
+        return {
+          url: downloadUrl,
+          filename: filename
+        };
     }catch(error){
         console.log("Error uploading image to firebase", error);
         return null;
