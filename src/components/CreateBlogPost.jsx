@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { IoIosClose } from "react-icons/io";
+import uploadDocument from "@/firebase/uploadDocumentToFirestore";
 
 const article = {
   'title': '',
@@ -21,13 +22,14 @@ const article = {
 
 export default function CreateBlogPost() {
   const [step, setStep] = useState(1);
+  const [selectedImage, setSeletedImage] = useState(undefined);
   const [articleForm, setArticleForm] = useState(article);
 
   console.log("content", articleForm.content)
   return (
     <ArticleFormContext.Provider value={{articleForm, setArticleForm}}>
       {step === 1 && <StepOne setStep={setStep} />}
-      {step === 2 && <StepTwo setStep={setStep} /> }
+      {step === 2 && <StepTwo setStep={setStep} selectedImage={selectedImage} setSeletedImage={setSeletedImage} /> }
     </ArticleFormContext.Provider>
   )
 }
@@ -190,9 +192,8 @@ StepOne.propTypes = {
   setStep: PropTypes.func.isRequired
 }
 
-const StepTwo = ({setStep}) => {
+const StepTwo = ({setStep, selectedImage, setSeletedImage}) => {
   const {articleForm, setArticleForm} = useArticleFormContext();
-  const [selectedImage, setSeletedImage] = useState(undefined);
   const tagRef = useRef(null);
 
   const tagsRemoveHandler = (tag) => {
@@ -207,7 +208,7 @@ const StepTwo = ({setStep}) => {
       tags: [...tags]
     })
   }
-
+  console.log(selectedImage, "in step two")
   const addTagHandler = () => {
     const tag = tagRef.current.value
     if(articleForm.tags.includes(tag)){
@@ -253,6 +254,10 @@ const StepTwo = ({setStep}) => {
       throw new Error("Error uploading thumbnail image")
     }
   }
+
+  const articleUploadHandler = async() => {
+    await uploadDocument(articleForm, "articles")
+  }
   return (
     <div className="flex justify-center w-full h-full sm:px-1 md:px-10 lg:px-20 py-8 overflow-y-scroll">
       <Card className=" relative w-full max-w-2xl mx-2" >
@@ -271,6 +276,7 @@ const StepTwo = ({setStep}) => {
                   id="thumbnailImage"
                   type="file"
                   accept="image/*"
+                  placeholder="Thumbnail"
                   onChange={(e)=>imagePickHandler(e)}
                   required />
           </div>
@@ -278,7 +284,7 @@ const StepTwo = ({setStep}) => {
             <Label htmlFor="tags">Tags</Label>
             {articleForm.tags.map((tag)=> (<TagCard key={tag} content={tag} tagsHandler={tagsRemoveHandler}/>))}
             <Input id="tags" type="text" required ref={tagRef} />
-            <Button onClick={addTagHandler}>Create</Button>
+            <Button onClick={addTagHandler}>Add</Button>
           </div>
         </CardContent>
       </Card>
@@ -287,12 +293,19 @@ const StepTwo = ({setStep}) => {
           Back
         </Button>
       </div>
+      <div className="absolute bottom-4 right-4 z-10">
+        <Button className="w-auto px-4 py-2" onClick={articleUploadHandler}>
+          Create
+        </Button>
+      </div>
     </div>
   )
 }
 
 StepTwo.propTypes = {
-  setStep: PropTypes.func.isRequired
+  setStep: PropTypes.func.isRequired,
+  selectedImage: PropTypes.object,
+  setSeletedImage: PropTypes.func
 }
 
 const TagCard = ({content, tagsHandler}) => {
