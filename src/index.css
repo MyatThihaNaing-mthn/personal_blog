@@ -17,6 +17,21 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+@font-face {
+  font-family: "Cormorant";
+  src: local("CormorantGaramond-Regular"), url("../src/assets/fonts/Cormorant_Garamond/CormorantGaramond-Regular.ttf") format("truetype")
+}
+
+@font-face {
+  font-family: "Cormorant-Medium";
+  src: local("CormorantGaramond-Medium"), url("../src/assets/fonts/Cormorant_Garamond/CormorantGaramond-Medium.ttf") format("truetype")
+}
+
+@font-face {
+  font-family: "Cormorant-Bold";
+  src: local("CormorantGaramond-Bold"), url("../src/assets/fonts/Cormorant_Garamond/CormorantGaramond-Bold.ttf") format("truetype")
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

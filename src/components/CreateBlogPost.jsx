@@ -176,7 +176,7 @@ const StepOne = ({placeholder="Start Typing here", setStep}) => {
           onChange={newContent => onChangeHandler(newContent)}
         />
       </div>
-      <div className="absolute bottom-4 right-4 z-10">
+      <div className="absolute bottom-16 right-4 z-10">
         <Button className="w-auto px-4 py-2" onClick={onClickHandler}>
           Next
         </Button>
@@ -288,12 +288,12 @@ const StepTwo = ({setStep, selectedImage, setSeletedImage}) => {
           </div>
         </CardContent>
       </Card>
-      <div className="absolute bottom-4 left-4 z-10">
+      <div className="absolute bottom-16 left-4 z-10">
         <Button className="w-auto px-4 py-2" onClick={stepHandler}>
           Back
         </Button>
       </div>
-      <div className="absolute bottom-4 right-4 z-10">
+      <div className="absolute bottom-16 right-4 z-10">
         <Button className="w-auto px-4 py-2" onClick={articleUploadHandler}>
           Create
         </Button>
