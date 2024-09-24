@@ -9,7 +9,10 @@
 }
 html, body{
   height: 100%;
+  position: relative;
 }
+
+
 
 @media (max-width: 720px){
   #root {

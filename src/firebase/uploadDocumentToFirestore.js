@@ -6,5 +6,10 @@ export default async function uploadDocument(document, collection) {
         console.log("uploaded document to firestore")
     ).catch(error => {
         console.log("error uploading document to firestore", error)
+        throw new Error("error uploading document to firestore", error)
     })
 }
+
+// export async function updateDocument(document) {
+    
+// }

@@ -1,6 +1,26 @@
+import { useEffect, useState } from "react"
+
 export default function Footer() {
+    const [endOfScroll, setEndOfScroll] = useState(false);
+    
+    const handldeScroll = () => {
+        const scrollTop = window.scrollY;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight
+        if (scrollTop + windowHeight >= documentHeight) {
+            setEndOfScroll(true);
+          } else {
+            setEndOfScroll(false);
+          }
+    }
+    console.log("End of scroll :", endOfScroll)
+
+    useEffect(()=> {
+        window.addEventListener('scroll', handldeScroll);
+        return ()=> window.removeEventListener('scroll', handldeScroll)
+    })
     return (
-        <footer className="fixed w-full py-4 bg-red-500 bottom-0">
+        <footer className={`fixed w-full py-4 bg-red-500 left-0 bottom-0 transition-transform duration-300 ${endOfScroll ? 'translate-y-0' : 'translate-y-full'}`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <ul className="flex justify-center space-x-6">
                     <li>

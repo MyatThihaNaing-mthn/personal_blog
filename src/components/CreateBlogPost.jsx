@@ -14,10 +14,22 @@ import { IoIosClose } from "react-icons/io";
 import uploadDocument from "@/firebase/uploadDocumentToFirestore";
 
 const article = {
+  'id': '',
   'title': '',
   'content': '',
   'thumbnailImage': '',
-  'tags': []
+  'tags': [],
+  'fetchCount': 0
+}
+
+const articleSummary = {
+  'id' : '',
+  'title': '',
+  'thumbnailImage' : '',
+  'createdAt': ''
+}
+const placeholder = {
+  value: "Start Typing here"
 }
 
 export default function CreateBlogPost() {
@@ -25,24 +37,24 @@ export default function CreateBlogPost() {
   const [selectedImage, setSeletedImage] = useState(undefined);
   const [articleForm, setArticleForm] = useState(article);
 
-  console.log("content", articleForm.content)
+  console.log("re-rendered")
   return (
     <ArticleFormContext.Provider value={{articleForm, setArticleForm}}>
-      {step === 1 && <StepOne setStep={setStep} />}
+      {step === 1 && <StepOne setStep={setStep} placeholder={placeholder} />}
       {step === 2 && <StepTwo setStep={setStep} selectedImage={selectedImage} setSeletedImage={setSeletedImage} /> }
     </ArticleFormContext.Provider>
   )
 }
 
 
-const StepOne = ({placeholder="Start Typing here", setStep}) => {
+const StepOne = ({placeholder, setStep}) => {
   const editorRef = useRef(null);
   const {articleForm, setArticleForm} = useArticleFormContext();
   const [content, setContent] = useState('');
-
+  console.log("re-rendered step one")
   // Store imageupload success obj {url,filename}
   const [imagesInContent, setImagesInContent] = useState([]);
-  placeholder = content === ''? placeholder : '';
+  placeholder = placeholder ? placeholder.value : "Start typing here";
   const config = useMemo(() => ({
     placeholder: placeholder,
     style: {
@@ -119,38 +131,28 @@ const StepOne = ({placeholder="Start Typing here", setStep}) => {
   }), [placeholder]);
 
   const onChangeHandler = useCallback(
-    (content) => {
+    (newContent) => {
       console.log(content);
+      setContent(newContent);
 
-      setContent(content);
-
-      // const imageUrlsInEditor = Array.from(content.matchAll(/<img src="([^"]+)"/g)).map(match => match[1]);
-      // console.log("imageUrls in editor", imageUrlsInEditor)
-      // console.log("images in content", imagesInContent)
-      // const deletedImages = imagesInContent.filter(obj => !imageUrlsInEditor.includes(obj.url));
-      // console.log("deleted images ", deletedImages)
-      // deletedImages.forEach(obj => {
-      //   const filename = obj.filename;
-      //   deleteImageInFirebase(filename).catch(error => console.log("Error deleting image in firebase", error));
-      // })
-      // const updatedImages = imagesInContent.filter(obj => !deletedImages.includes(obj));
-      // setImagesInContent(updatedImages);
-    }, []
+      console.log("next ", imagesInContent)
+      const imageUrlsInEditor = Array.from(content.matchAll(/<img src="([^"]+)"/g)).map(match => match[1]);
+      console.log("imageUrls in editor", imageUrlsInEditor)
+      console.log("images in content", imagesInContent)
+      const decodedUrls = imageUrlsInEditor.map(url => url.replace(/&amp;/g, '&'));
+      const imagesToDelete = imagesInContent.filter(obj => !decodedUrls.includes(obj.url));
+      console.log("images to be deleted ", imagesToDelete)
+      imagesToDelete.forEach(obj => {
+        const filename = obj.filename;
+        console.log("deleted here")
+        deleteImageInFirebase(filename).catch(error => console.log("Error deleting image in firebase", error));
+      })
+      const updatedImages = imagesInContent.filter(obj => !imagesToDelete.includes(obj));
+      setImagesInContent(updatedImages);
+    }, [content, imagesInContent]
   )
 
   const onClickHandler = () =>{
-    console.log("next ", imagesInContent)
-    const imageUrlsInEditor = Array.from(content.matchAll(/<img src="([^"]+)"/g)).map(match => match[1]);
-    console.log("imageUrls in editor", imageUrlsInEditor)
-    console.log("images in content", imagesInContent)
-    const deletedImages = imagesInContent.filter(obj => !imageUrlsInEditor.includes(obj.url));
-    console.log("deleted images ", deletedImages)
-    deletedImages.forEach(obj => {
-      const filename = obj.filename;
-      deleteImageInFirebase(filename).catch(error => console.log("Error deleting image in firebase", error));
-    })
-    const updatedImages = imagesInContent.filter(obj => !deletedImages.includes(obj));
-    setImagesInContent(updatedImages);
     setArticleForm({
       ...articleForm,
       content: content
@@ -162,7 +164,7 @@ const StepOne = ({placeholder="Start Typing here", setStep}) => {
     if(articleForm.content !== ''){
       setContent(articleForm.content);
     }
-  }, [])
+  }, [articleForm.content])
 
   return (
     <>
@@ -176,7 +178,7 @@ const StepOne = ({placeholder="Start Typing here", setStep}) => {
           onChange={newContent => onChangeHandler(newContent)}
         />
       </div>
-      <div className="absolute bottom-16 right-4 z-10">
+      <div className="fixed bottom-16 right-4 z-10">
         <Button className="w-auto px-4 py-2" onClick={onClickHandler}>
           Next
         </Button>
@@ -256,6 +258,15 @@ const StepTwo = ({setStep, selectedImage, setSeletedImage}) => {
   }
 
   const articleUploadHandler = async() => {
+    
+    articleForm.id = Date.now().toString();
+    // upload separate article summary document for summary collections
+    articleSummary.id = articleForm.id;
+    articleSummary.title = articleForm.title;
+    articleSummary.thumbnailImage = articleForm.thumbnailImage;
+    articleSummary.createdAt = Date.now().toString();
+
+    await uploadDocument(articleSummary, "article-summary")
     await uploadDocument(articleForm, "articles")
   }
   return (
@@ -288,12 +299,12 @@ const StepTwo = ({setStep, selectedImage, setSeletedImage}) => {
           </div>
         </CardContent>
       </Card>
-      <div className="absolute bottom-16 left-4 z-10">
+      <div className=" fixed bottom-16 left-4 z-10">
         <Button className="w-auto px-4 py-2" onClick={stepHandler}>
           Back
         </Button>
       </div>
-      <div className="absolute bottom-16 right-4 z-10">
+      <div className=" fixed bottom-16 right-4 z-10">
         <Button className="w-auto px-4 py-2" onClick={articleUploadHandler}>
           Create
         </Button>
