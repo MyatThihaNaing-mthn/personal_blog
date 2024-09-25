@@ -1,7 +1,8 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { auth } from "../../firebase/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { AuthContext } from "./authContext";
+import PropTypes from 'prop-types';
 
 
 export function AuthProvider({ children }) {
@@ -32,4 +33,6 @@ export function AuthProvider({ children }) {
     );
 }
 
-
+AuthProvider.propTypes = {
+    children: PropTypes.node.isRequired,  
+};

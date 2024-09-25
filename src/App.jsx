@@ -7,6 +7,7 @@ import Login from './components/LogIn'
 import ArticleList from './components/ArticleList'
 import CreateBlogPost from './components/CreateBlogPost'
 import Article from './components/Article'
+import EditArticle from './components/EditArticle'
 
 function App() {
 
@@ -19,7 +20,8 @@ function App() {
             <Route path='/admin/login' element={<Login />} />
             <Route path='/' element={<ArticleList />} />
             <Route path='/article/create' element={<CreateBlogPost />} />
-            <Route path='/article/111' element={<Article/>} />
+            <Route path='/article/:id' element={<Article/>} />
+            <Route path='/article/edit/:id' element={<EditArticle />} />
           </Routes>
         </Layout>
       </BrowserRouter>

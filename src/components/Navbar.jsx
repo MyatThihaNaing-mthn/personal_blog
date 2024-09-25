@@ -13,11 +13,11 @@ export default function Navbar() {
     
     return <header className=" h-12">
         <nav
-            className={`fixed top-0 py-4 bg-main-bg-color navbar-shadow z-50 left-0 bg-red-500 w-full`}>
+            className={`fixed top-0 py-4 bg-white navbar-shadow z-50 left-0 shadow-lg w-full`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center h-16">
+                <div className="flex justify-between items-center h-12">
                     <div className="flex-shrink-0">
-                        <img src={logo} alt='logo' className=' w-10 h-10 sm:w-12 sm:h-16' />
+                        <img src={logo} alt='logo' className=' w-10 h-10 sm:w-12 sm:h-10' />
 
                     </div>
                     <div className='block md:hidden'>
@@ -28,17 +28,17 @@ export default function Navbar() {
                     </div>
                     <div className="hidden md:block">
                         <div className="ml-10 flex items-baseline space-x-4">
-                            <p className=" text-white hover:text-green px-3 py-2 rounded-md text-sm cursor-pointer font-medium"
+                            <p className=" text-black hover:text-green px-3 py-2 rounded-md text-sm cursor-pointer font-medium"
                                 onClick={() => console.log("nav")}>
                                 All Articles
                             </p>
                             {userLoggedIn? (
-                                <p className="text-white hover:text-green px-3 py-2 rounded-md text-sm cursor-pointer font-medium"
+                                <p className="text-black hover:text-green px-3 py-2 rounded-md text-sm cursor-pointer font-medium"
                                 onClick={() => navigate("/article/create")}>
                                 New Article
                                 </p>
                             ): (
-                                <p className="text-white hover:text-green px-3 py-2 rounded-md text-sm cursor-pointer font-medium"
+                                <p className="text-black hover:text-green px-3 py-2 rounded-md text-sm cursor-pointer font-medium"
                                 onClick={() => console.log("nav")}>
                                 Contact
                             </p>

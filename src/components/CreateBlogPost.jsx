@@ -12,8 +12,10 @@ import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { IoIosClose } from "react-icons/io";
 import uploadDocument from "@/firebase/uploadDocumentToFirestore";
+import { useNavigate } from "react-router-dom";
+import { extractSummaryFromArticle } from "@/utils/utils";
 
-const article = {
+const defaultArticle = {
   'id': '',
   'title': '',
   'content': '',
@@ -23,35 +25,40 @@ const article = {
 }
 
 const articleSummary = {
-  'id' : '',
+  'id': '',
   'title': '',
-  'thumbnailImage' : '',
+  'content': '',
+  'thumbnailImage': '',
   'createdAt': ''
 }
 const placeholder = {
   value: "Start Typing here"
 }
 
-export default function CreateBlogPost() {
+export default function CreateBlogPost({ article = defaultArticle, updateHandler }) {
   const [step, setStep] = useState(1);
   const [selectedImage, setSeletedImage] = useState(undefined);
   const [articleForm, setArticleForm] = useState(article);
 
-  console.log("re-rendered")
   return (
-    <ArticleFormContext.Provider value={{articleForm, setArticleForm}}>
+    <ArticleFormContext.Provider value={{ articleForm, setArticleForm }}>
       {step === 1 && <StepOne setStep={setStep} placeholder={placeholder} />}
-      {step === 2 && <StepTwo setStep={setStep} selectedImage={selectedImage} setSeletedImage={setSeletedImage} /> }
+      {step === 2 && <StepTwo setStep={setStep} selectedImage={selectedImage} setSeletedImage={setSeletedImage} updateHandler={updateHandler} />}
     </ArticleFormContext.Provider>
   )
 }
 
+CreateBlogPost.propTypes = {
+  article: PropTypes.object,
+  updateHandler: PropTypes.func,
+}
 
-const StepOne = ({placeholder, setStep}) => {
+const StepOne = ({ placeholder, setStep }) => {
   const editorRef = useRef(null);
-  const {articleForm, setArticleForm} = useArticleFormContext();
-  const [content, setContent] = useState('');
-  console.log("re-rendered step one")
+  const { articleForm, setArticleForm } = useArticleFormContext();
+  console.log(articleForm)
+  const [content, setContent] = useState(articleForm.content);
+
   // Store imageupload success obj {url,filename}
   const [imagesInContent, setImagesInContent] = useState([]);
   placeholder = placeholder ? placeholder.value : "Start typing here";
@@ -152,7 +159,7 @@ const StepOne = ({placeholder, setStep}) => {
     }, [content, imagesInContent]
   )
 
-  const onClickHandler = () =>{
+  const onClickHandler = () => {
     setArticleForm({
       ...articleForm,
       content: content
@@ -161,7 +168,7 @@ const StepOne = ({placeholder, setStep}) => {
   }
 
   useEffect(() => {
-    if(articleForm.content !== ''){
+    if (articleForm.content !== '') {
       setContent(articleForm.content);
     }
   }, [articleForm.content])
@@ -194,15 +201,15 @@ StepOne.propTypes = {
   setStep: PropTypes.func.isRequired
 }
 
-const StepTwo = ({setStep, selectedImage, setSeletedImage}) => {
-  const {articleForm, setArticleForm} = useArticleFormContext();
+const StepTwo = ({ setStep, selectedImage, setSeletedImage, updateHandler }) => {
+  const { articleForm, setArticleForm } = useArticleFormContext();
   const tagRef = useRef(null);
+  const navigate = useNavigate();
 
   const tagsRemoveHandler = (tag) => {
-    console.log("remove tag")
     const tags = articleForm.tags
     const index = tags.indexOf(tag);
-    if(index > -1){
+    if (index > -1) {
       tags.splice(index, 1)
     }
     setArticleForm({
@@ -210,10 +217,10 @@ const StepTwo = ({setStep, selectedImage, setSeletedImage}) => {
       tags: [...tags]
     })
   }
-  console.log(selectedImage, "in step two")
+
   const addTagHandler = () => {
     const tag = tagRef.current.value
-    if(articleForm.tags.includes(tag)){
+    if (articleForm.tags.includes(tag)) {
       return
     }
     tagRef.current.value = ''
@@ -234,40 +241,45 @@ const StepTwo = ({setStep, selectedImage, setSeletedImage}) => {
     setStep(1);
   }
   const imagePickHandler = async (e) => {
-    if(e.target.files.length < 1){
+    if (e.target.files.length < 1) {
       return
     }
-    if(e.target.files != null && e.target.files.length > 0){
+    if (e.target.files != null && e.target.files.length > 0) {
       const image = e.target.files[0];
-      if( selectedImage && image.name === selectedImage){
+      if (selectedImage && image.name === selectedImage) {
         return
-      }else if(selectedImage){
+      } else if (selectedImage) {
         await deleteImageInFirebase(selectedImage)
       }
       const uploadedImage = await uploadImageToFirebase(image);
-      if(uploadedImage){
+      if (uploadedImage) {
         setArticleForm({
           ...articleForm,
           thumbnailImage: uploadedImage.url
         })
         setSeletedImage(uploadedImage.filename)
-        return 
+        return
       }
       throw new Error("Error uploading thumbnail image")
     }
   }
 
-  const articleUploadHandler = async() => {
-    
-    articleForm.id = Date.now().toString();
-    // upload separate article summary document for summary collections
-    articleSummary.id = articleForm.id;
-    articleSummary.title = articleForm.title;
-    articleSummary.thumbnailImage = articleForm.thumbnailImage;
-    articleSummary.createdAt = Date.now().toString();
+  const articleUploadHandler = async () => {
+    if (updateHandler === undefined) {
+      articleForm.id = Date.now().toString();
+      // upload separate article summary document for summary collections
+      articleSummary.id = articleForm.id;
+      articleSummary.title = articleForm.title;
+      articleSummary.thumbnailImage = articleForm.thumbnailImage;
+      articleSummary.content = extractSummaryFromArticle(articleForm.content)
+      articleSummary.createdAt = Date.now().toString();
 
-    await uploadDocument(articleSummary, "article-summary")
-    await uploadDocument(articleForm, "articles")
+      await uploadDocument(articleSummary, "article-summary")
+      await uploadDocument(articleForm, "articles")
+    }else{
+      await updateHandler(articleForm);
+    }
+    navigate("/")
   }
   return (
     <div className="flex justify-center w-full h-full sm:px-1 md:px-10 lg:px-20 py-8 overflow-y-scroll">
@@ -276,24 +288,24 @@ const StepTwo = ({setStep, selectedImage, setSeletedImage}) => {
           <CardTitle className=" text-2xl">Article Summary</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4">
-        <div className=" grid gap-2">
+          <div className=" grid gap-2">
             <Label htmlFor="title">Title</Label>
-            <Input id="title" type="text" required onChange={(e)=>titleChangeHandler(e)}/>
+            <Input id="title" type="text" value={articleForm.title} required onChange={(e) => titleChangeHandler(e)} />
           </div>
           <div className=" grid gap-2">
             <Label htmlFor="thumbnailImage">Thumbnail Image</Label>
             <span></span>
             <Input className=" w-full max-w-xs"
-                  id="thumbnailImage"
-                  type="file"
-                  accept="image/*"
-                  placeholder="Thumbnail"
-                  onChange={(e)=>imagePickHandler(e)}
-                  required />
+              id="thumbnailImage"
+              type="file"
+              accept="image/*"
+              placeholder="Thumbnail"
+              onChange={(e) => imagePickHandler(e)}
+              required />
           </div>
           <div className=" grid gap-2">
             <Label htmlFor="tags">Tags</Label>
-            {articleForm.tags.map((tag)=> (<TagCard key={tag} content={tag} tagsHandler={tagsRemoveHandler}/>))}
+            {articleForm.tags.map((tag) => (<TagCard key={tag} content={tag} tagsHandler={tagsRemoveHandler} />))}
             <Input id="tags" type="text" required ref={tagRef} />
             <Button onClick={addTagHandler}>Add</Button>
           </div>
@@ -306,7 +318,7 @@ const StepTwo = ({setStep, selectedImage, setSeletedImage}) => {
       </div>
       <div className=" fixed bottom-16 right-4 z-10">
         <Button className="w-auto px-4 py-2" onClick={articleUploadHandler}>
-          Create
+          {updateHandler? "Save": "Create"}
         </Button>
       </div>
     </div>
@@ -316,10 +328,11 @@ const StepTwo = ({setStep, selectedImage, setSeletedImage}) => {
 StepTwo.propTypes = {
   setStep: PropTypes.func.isRequired,
   selectedImage: PropTypes.object,
-  setSeletedImage: PropTypes.func
+  setSeletedImage: PropTypes.func,
+  updateHandler: PropTypes.func
 }
 
-const TagCard = ({content, tagsHandler}) => {
+const TagCard = ({ content, tagsHandler }) => {
 
   return (
     <Card className="w-fit">
@@ -327,7 +340,7 @@ const TagCard = ({content, tagsHandler}) => {
         {content}
         <IoIosClose size={20}
           className=" cursor-pointer"
-          onClick={()=>tagsHandler(content)}
+          onClick={() => tagsHandler(content)}
         />
       </CardContent>
     </Card>

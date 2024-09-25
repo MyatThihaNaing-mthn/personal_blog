@@ -19,7 +19,8 @@ export default async function fetch(id){
             fetchCount: (firstDoc.data().fetchCount || 0) + 1 
         };
         updateDoc(docRef, updatedData)
-        updateArticleSummary(firstDoc.id)
+        updateArticleSummary(id)
+        console.log("summary doc id ", id)
         return firstDoc.data(); 
     }else{
         throw new Error("No matching documents found");
@@ -27,6 +28,21 @@ export default async function fetch(id){
 
 }
 
+export async function fetchDocumentById(id, collectionName) {
+    const articlesRef = collection(db, collectionName);
+
+    const q = query(articlesRef, where("id", "==", id));
+
+    const querySnapshot = await getDocs(q);
+
+    if(!querySnapshot.empty){
+        const firstDoc = querySnapshot.docs[0];
+    
+        return firstDoc;
+    }else{
+        throw new Error("No matching documents found");
+    } 
+}
 
 async function updateArticleSummary(id) {
     console.log(id)
@@ -63,6 +79,23 @@ export async function fetchFeaturedArticles() {
         return featuredArticles;
     }else{
         console.log("No documents found for features")
+        throw new Error("No matching documents found")
+    }
+}
+
+export async function fetchRecentArticles() {
+    const summaryRef = collection(db, "article-summary");
+    const q = query(summaryRef, orderBy("createdAt", "desc"), limit(6));
+
+    const querySnapshot = await getDocs(q);
+
+    if(!querySnapshot.empty){
+        const recentArticles = querySnapshot.docs.map(doc => ({
+            ...doc.data()
+        }));
+        return recentArticles;
+    }else{
+        console.log("No documents found for recent posts")
         throw new Error("No matching documents found"); 
     }
 }

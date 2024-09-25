@@ -1,26 +1,34 @@
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import PropTypes from 'prop-types';
+import { convertMonthDayFromTimeUnits } from "@/utils/utils";
 
 export default function ArticleCard({ article, isFeatured=false }) {
+    const navigate = useNavigate();
 
-    let featureArticle = '';
+    let featureArticle = 'text-xl bold';
     if(isFeatured === true){
         featureArticle = " text-3xl bold"
     }
 
+    const clickHandler = (id) => {
+        navigate(`article/${id}`)
+    }
+
     return (
-        <Card className=" w-full overflow-hidden border-none shadow-none">
+        <Card className=" w-full overflow-hidden border-none shadow-none cursor-pointer pb-4"
+            onClick={()=>clickHandler(article.id)}>
             <CardHeader className=" p-0">
-                <div className="w-full aspect-[2/1]">
+                <div className="w-full relative" style={{paddingBottom: '50%'}}>
                     <img src={article.thumbnailImage} alt="article image"
-                        className="max-w-full w-full h-full object-cover rounded-xl" />
+                        className=" absolute top-0 left-0 max-w-full w-full h-full object-cover rounded-xl" />
                 </div>
             </CardHeader>
             <div className=" w-full flex flex-col items-end mb-2">
                 <div className=" w-full h-px bg-foreground mt-4">
                 </div>
                 <div className=" text-sm">
-                    {article.createdAt}
+                    {convertMonthDayFromTimeUnits(article.createdAt)}
                 </div>
             </div>
             <CardContent className=" p-0 pb-4">
@@ -28,7 +36,7 @@ export default function ArticleCard({ article, isFeatured=false }) {
                     {article && article.title}
                 </CardTitle>
                 <CardDescription className="line-clamp-3 mt-2 overflow-hidden text-ellipsis whitespace-normal leading-none">
-                    There are a number of reasons you may need a block of text and when you do, a random paragraph can be the perfect solution. If you happen to be a web designer and you need some random text to show in your layout, a random paragraph can be an excellent way to do this.
+                    {article.content}
                 </CardDescription>
             </CardContent>
         </Card>

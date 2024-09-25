@@ -20,7 +20,7 @@ export default function Footer() {
         return ()=> window.removeEventListener('scroll', handldeScroll)
     })
     return (
-        <footer className={`fixed w-full py-4 bg-red-500 left-0 bottom-0 transition-transform duration-300 ${endOfScroll ? 'translate-y-0' : 'translate-y-full'}`}>
+        <footer className={`fixed w-full py-4 bg-gray-900 left-0 bottom-0 transition-transform duration-300 ${endOfScroll ? 'translate-y-0' : 'translate-y-full'}`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <ul className="flex justify-center space-x-6">
                     <li>
