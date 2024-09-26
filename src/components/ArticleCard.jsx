@@ -12,7 +12,7 @@ export default function ArticleCard({ article, isFeatured=false }) {
     }
 
     const clickHandler = (id) => {
-        navigate(`article/${id}`)
+        navigate(`/article/${id}`)
     }
 
     return (
@@ -31,8 +31,8 @@ export default function ArticleCard({ article, isFeatured=false }) {
                     {convertMonthDayFromTimeUnits(article.createdAt)}
                 </div>
             </div>
-            <CardContent className=" p-0 pb-4">
-                <CardTitle className={featureArticle}>
+            <CardContent className=" p-0 pb-4 font-cormoran_bold ">
+                <CardTitle className={`${featureArticle} line-clamp-1 overflow-hidden `}>
                     {article && article.title}
                 </CardTitle>
                 <CardDescription className="line-clamp-3 mt-2 overflow-hidden text-ellipsis whitespace-normal leading-none">
