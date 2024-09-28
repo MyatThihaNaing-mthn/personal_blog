@@ -23,7 +23,7 @@ function App() {
             <Route path='/article/create' element={<CreateBlogPost />} />
             <Route path='/article/:id' element={<Article/>} />
             <Route path='/article/edit/:id' element={<EditArticle />} />
-            <Route path='/all-articles/:id?' element={<AllArticles/> } />
+            <Route path='/all-articles/:pageNo?' element={<AllArticles/> } />
           </Routes>
         </Layout>
       </BrowserRouter>

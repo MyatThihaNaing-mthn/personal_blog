@@ -1,9 +1,13 @@
 import { useEffect, useRef } from "react"
 import { RiCloseFill } from "react-icons/ri";
 import PropTypes from "prop-types";
+import { useAuth } from "@/contexts/auth/useAuth";
+import { useNavigate } from "react-router-dom";
 
 export default function Drawer({ isMenuOpen, setMenuOpen }) {
     const drawerRef = useRef(null);
+    const { userLoggedIn } = useAuth();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -38,11 +42,10 @@ export default function Drawer({ isMenuOpen, setMenuOpen }) {
                     onClick={() => setMenuOpen(false)}
                 />
             )}
-            <aside 
-                ref={drawerRef} 
-                className={`fixed top-0 right-0 w-2/3 h-full bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${
-                    isMenuOpen ? 'translate-x-0' : 'translate-x-full'
-                }`}
+            <aside
+                ref={drawerRef}
+                className={`fixed top-0 right-0 w-2/3 h-full bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+                    }`}
             >
                 <RiCloseFill
                     className="absolute top-4 right-4 cursor-pointer"
@@ -52,15 +55,28 @@ export default function Drawer({ isMenuOpen, setMenuOpen }) {
                 <nav className="mt-28 flex flex-col items-center">
                     <div
                         className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer"
-                        onClick={() => setMenuOpen(false)}
+                        onClick={() => {
+                            setMenuOpen(false)
+                            navigate("/all-articles/")
+                        }}
                     >
                         All Articles
                     </div>
                     <div
                         className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer"
-                        onClick={() => setMenuOpen(false)}
+                        onClick={() => {
+                            setMenuOpen(false)
+                            if (userLoggedIn) {
+                                navigate("/article/create")
+                            } else {
+                                window.scrollTo({
+                                    top: document.body.scrollHeight,
+                                    behavior: "smooth"
+                                });
+                            }
+                        }}
                     >
-                        Contact
+                        {userLoggedIn ? "New Article" : "Contact"}
                     </div>
                 </nav>
             </aside>

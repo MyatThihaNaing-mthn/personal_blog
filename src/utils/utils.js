@@ -1,5 +1,6 @@
 import DOMPurify from 'dompurify';
 
+const AVERAGE_WPM = 200;
 
 export function createMarkup(dirty) {
     return { __html: DOMPurify.sanitize(dirty) };
@@ -24,7 +25,17 @@ export function convertMonthDayFromTimeUnits(instant){
     return `${month} ${date}`
 }
 
-export function extractSummaryFromArticle(htmlContent){
+export function extractSummaryFromArticle(words){
+    const summary = words.slice(0, 200).join(" ");
+
+    return summary;
+}
+
+export function getTimeToRead(words){
+    return Math.floor(words.length / AVERAGE_WPM) + " mins";
+}
+
+export function getWordArray(htmlContent){
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = htmlContent;
 
@@ -32,9 +43,7 @@ export function extractSummaryFromArticle(htmlContent){
 
     const text = Array.from(paragraphs).map(paragraph => paragraph.textContent).join(" ");
 
-    const words = text.split(/\+s/)
-
-    const summary = words.slice(0, 200).join(" ");
-
-    return summary;
+    const words = text.split(/\s+/)
+    console.log(words)
+    return words;
 }

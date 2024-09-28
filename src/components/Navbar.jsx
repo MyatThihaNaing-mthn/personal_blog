@@ -16,9 +16,9 @@ export default function Navbar() {
             className={`fixed top-0 py-4 bg-white navbar-shadow z-50 left-0 shadow-lg w-full`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-12">
-                    <div className="flex-shrink-0">
+                    <div className="flex-shrink-0 cursor-pointer"
+                        onClick={()=> navigate("/")}>
                         <img src={logo} alt='logo' className=' w-10 h-10 sm:w-12 sm:h-10' />
-
                     </div>
                     <div className='block md:hidden'>
                         <RiMenu4Line
@@ -29,7 +29,7 @@ export default function Navbar() {
                     <div className="hidden md:block">
                         <div className="ml-10 flex items-baseline space-x-4">
                             <p className=" text-black hover:text-green px-3 py-2 rounded-md text-sm cursor-pointer font-medium"
-                                onClick={() => console.log("nav")}>
+                                onClick={() => navigate("/all-articles")}>
                                 All Articles
                             </p>
                             {userLoggedIn? (

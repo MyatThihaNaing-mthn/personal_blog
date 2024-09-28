@@ -13,7 +13,7 @@ import { Input } from "./ui/input";
 import { IoIosClose } from "react-icons/io";
 import uploadDocument from "@/firebase/uploadDocumentToFirestore";
 import { useNavigate } from "react-router-dom";
-import { extractSummaryFromArticle } from "@/utils/utils";
+import { extractSummaryFromArticle, getTimeToRead, getWordArray } from "@/utils/utils";
 
 const defaultArticle = {
   'id': '',
@@ -21,7 +21,8 @@ const defaultArticle = {
   'content': '',
   'thumbnailImage': '',
   'tags': [],
-  'fetchCount': 0
+  'fetchCount': 0,
+  'ttr': ''
 }
 
 const articleSummary = {
@@ -268,11 +269,16 @@ const StepTwo = ({ setStep, selectedImage, setSeletedImage, updateHandler }) => 
     if (updateHandler === undefined) {
       articleForm.id = Date.now().toString();
       // upload separate article summary document for summary collections
+
+      const words = getWordArray(articleForm.content)
+      const timeToRead = getTimeToRead(words);
+
       articleSummary.id = articleForm.id;
       articleSummary.title = articleForm.title;
       articleSummary.thumbnailImage = articleForm.thumbnailImage;
-      articleSummary.content = extractSummaryFromArticle(articleForm.content)
+      articleSummary.content = extractSummaryFromArticle(words);
       articleSummary.createdAt = Date.now().toString();
+      articleSummary.ttr = timeToRead;
 
       await uploadDocument(articleSummary, "article-summary")
       await uploadDocument(articleForm, "articles")

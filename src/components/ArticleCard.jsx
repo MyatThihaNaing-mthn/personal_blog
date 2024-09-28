@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import PropTypes from 'prop-types';
-import { convertMonthDayFromTimeUnits } from "@/utils/utils";
 
 export default function ArticleCard({ article, isFeatured=false }) {
     const navigate = useNavigate();
@@ -28,7 +27,7 @@ export default function ArticleCard({ article, isFeatured=false }) {
                 <div className=" w-full h-px bg-foreground mt-4">
                 </div>
                 <div className=" text-sm">
-                    {convertMonthDayFromTimeUnits(article.createdAt)}
+                    {article.ttr}
                 </div>
             </div>
             <CardContent className=" p-0 pb-4 font-cormoran_bold ">

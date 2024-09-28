@@ -6,7 +6,7 @@ export default function Layout({children}){
     return (
         <div className=" container w-full max-w-full font-cormorant">
             <Navbar/>
-            <main className=" w-full max-w-7xl mt-14 mx-auto px-4 pb-12 sm:px-6 lg:px-8">
+            <main className=" w-full max-w-7xl mt-14 mx-auto px-4 pb-16 sm:px-6 lg:px-8">
                 {children}
             </main>
             <Footer/>

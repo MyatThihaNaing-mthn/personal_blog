@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 export default function Footer() {
     const [endOfScroll, setEndOfScroll] = useState(false);
     
-    const handldeScroll = () => {
+    const handleScroll = () => {
         const scrollTop = window.scrollY;
         const windowHeight = window.innerHeight;
         const documentHeight = document.documentElement.scrollHeight
@@ -13,11 +13,10 @@ export default function Footer() {
             setEndOfScroll(false);
           }
     }
-    console.log("End of scroll :", endOfScroll)
 
     useEffect(()=> {
-        window.addEventListener('scroll', handldeScroll);
-        return ()=> window.removeEventListener('scroll', handldeScroll)
+        window.addEventListener('scroll', handleScroll);
+        return ()=> window.removeEventListener('scroll', handleScroll)
     })
     return (
         <footer className={`fixed w-full py-4 bg-gray-900 left-0 bottom-0 transition-transform duration-300 ${endOfScroll ? 'translate-y-0' : 'translate-y-full'}`}>
@@ -34,7 +33,7 @@ export default function Footer() {
                         </a>
                     </li>
                     <li>
-                        <a href="https://github.com/MyatThihaNaing-mthn" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-gray-900 transition-colors duration-300">
+                        <a href="https://github.com/MyatThihaNaing-mthn" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-blue-500 transition-colors duration-300">
                             <svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
                                 <title>GitHub</title>
                                 <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
