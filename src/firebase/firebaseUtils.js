@@ -1,4 +1,4 @@
-import { collection, getCountFromServer } from "firebase/firestore";
+import { collection, deleteDoc, getCountFromServer } from "firebase/firestore";
 import { db } from "./firebase";
 import { fetchDocumentById } from "./fetchDocument";
 
@@ -11,12 +11,13 @@ export async function getTotalCount(collectionName){
     return snapshot.data().count;
 }
 
-export async function deleteDocumet(collectionName, docId) {
+export async function deleteDocument(collectionName, docId) {
     const doc = await fetchDocumentById(docId, collectionName);
     try{
-        await doc.ref.delete();
+        await deleteDoc(doc.ref)
     }catch(error){
         console.log("Error deleting document ", error);
         throw new Error("Error deleting document");
     }
 }
+
