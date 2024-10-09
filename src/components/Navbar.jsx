@@ -1,5 +1,5 @@
 import { useState } from "react"
-import logo from "../../src/assets/react.svg";
+import logo from "../../src/assets/logo.svg";
 import { RiMenu4Line } from "react-icons/ri";
 import Drawer from "./Drawer";
 import { useAuth } from "@/contexts/auth/useAuth";
@@ -18,7 +18,7 @@ export default function Navbar() {
                 <div className="flex justify-between items-center h-12">
                     <div className="flex-shrink-0 cursor-pointer"
                         onClick={()=> navigate("/")}>
-                        <img src={logo} alt='logo' className=' w-10 h-10 sm:w-12 sm:h-10' />
+                        <img src={logo} alt='logo' className=' w-12 h-12 sm:h-10 rounded-full' />
                     </div>
                     <div className='block md:hidden'>
                         <RiMenu4Line

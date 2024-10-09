@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+    <!-- Polygon shape (hexagonal) -->
+    <path fill="black" stroke="black" stroke-width="4" stroke-linejoin="round"
+        d="M 50 10 L 80 30 L 80 70 L 50 90 L 20 70 L 20 30 Z" />
+
+    <!-- Letter "M" drawn with path inside the polygon -->
+    <path fill="none" stroke="white" stroke-width="4"
+        d="M 35 65 L 35 35 L 50 50 L 65 35 L 65 65" />
+</svg>
