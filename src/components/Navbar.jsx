@@ -39,7 +39,13 @@ export default function Navbar() {
                                 </p>
                             ): (
                                 <p className="text-black hover:text-green px-3 py-2 rounded-md text-sm cursor-pointer font-medium"
-                                onClick={() => console.log("nav")}>
+                                onClick={() => {
+                                    window.scrollTo({
+                                    top: document.body.scrollHeight,
+                                    behavior: "smooth"
+                                });
+                                }
+                                }>
                                 Contact
                             </p>
                             )}
